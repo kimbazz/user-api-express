@@ -7,9 +7,15 @@ const userUC = new UserCase({ userRepo });
 export default {
   async create(req, res, next) {
     try {
-      const created = await userUC.create(req.body);
+      const resp = await userUC.create(req.body);
 
-      res.status(201).json(created);
+      const { isError } = resp;
+
+      if (isError) {
+        return res.status(400).json(resp);
+      }
+
+      res.status(201).json(resp);
     } catch (err) {
       next(err);
     }
@@ -17,9 +23,15 @@ export default {
 
   async getAll(req, res, next) {
     try {
-      const users = await userUC.findAll();
+      const resp = await userUC.findAll();
 
-      res.status(200).json(users);
+      const { isError } = resp;
+
+      if (isError) {
+        return res.status(404).json(resp);
+      }
+
+      res.status(200).json(resp);
     } catch (err) {
       next(err);
     }
@@ -28,9 +40,15 @@ export default {
   async getById(req, res, next) {
     const { id } = req.params;
     try {
-      const user = await userUC.findByID(id);
+      const resp = await userUC.findByID(id);
 
-      res.status(200).json(user);
+      const { isError } = resp;
+
+      if (isError) {
+        return res.status(404).json(resp);
+      }
+
+      res.status(200).json(resp);
     } catch (err) {
       next(err);
     }
@@ -40,12 +58,18 @@ export default {
     const { body, params } = req;
     const { id } = params;
     try {
-      const updated = await userUC.update({
+      const resp = await userUC.update({
         id,
         ...body,
       });
 
-      res.status(200).json(updated);
+      const { isError } = resp;
+
+      if (isError) {
+        return res.status(404).json(resp);
+      }
+
+      res.status(200).json(resp);
     } catch (err) {
       next(err);
     }
@@ -54,9 +78,15 @@ export default {
   async delete(req, res, next) {
     const { id } = req.params;
     try {
-      const deleted = await userUC.delete(id);
+      const resp = await userUC.delete(id);
 
-      res.status(204).send(deleted);
+      const { isError } = resp;
+
+      if (isError) {
+        return res.status(404).send(resp);
+      }
+
+      res.status(204).send(resp);
     } catch (err) {
       next(err);
     }
