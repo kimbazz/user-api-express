@@ -33,15 +33,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        id: publish
+        id: push
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/rezxplorer:latest
-        outputs:
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/rezxplorer:latest
 
   deploy:
     needs: build-and-publish
@@ -59,7 +57,7 @@ jobs:
         run: |
           # point Deployment at the new image:
           kubectl set image deployment/the-deployment-name \
-            the-container-name=${{ needs.build-and-publish.outputs.image }} \
+            the-container-name=${{ needs.build-and-publish.tags }} \
             --namespace=default
           # wait for rollout to finish
           kubectl rollout status deployment/the-deployment-name --namespace=default
