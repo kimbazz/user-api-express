@@ -18,6 +18,18 @@ export default class UserValidator {
     ];
   }
 
+  static login() {
+    return [
+      body("email")
+        .notEmpty()
+        .isEmail()
+        .withMessage("Must be a valid email")
+        .notEmpty()
+        .withMessage("Email cannot be empty"),
+      body("password").notEmpty().withMessage("Password cannot be empty"),
+    ];
+  }
+
   /** Validation rules for updating an existing user */
   static update() {
     return [

@@ -2,6 +2,7 @@ import { Router } from "express";
 import UserController from "../controllers/UserController.js";
 import UserValidator from "../validators/UserValidator.js";
 import validateRequest from "../../middleware/validateRequest.js";
+import jwtAuth from "../../middleware/jwtAuth.js";
 
 const router = Router();
 
@@ -12,10 +13,18 @@ router.post(
   UserController.create
 );
 
-router.get("/", UserController.getAll);
+router.post(
+  "/login",
+  UserValidator.login(),
+  validateRequest,
+  UserController.login
+);
+
+router.get("/", jwtAuth, UserController.getAll);
 
 router.get(
   "/:id",
+  jwtAuth,
   UserValidator.idParam(),
   validateRequest,
   UserController.getById
