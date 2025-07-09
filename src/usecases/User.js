@@ -138,9 +138,8 @@ export default class UserCase {
   async delete(id) {
     try {
       const user = await this.userRepo.delete(id);
-      console.log(user);
       if (!user) {
-      return {
+        return {
           user: null,
           isError: true,
           message: `User with id: ${id} not found, failed to delete data`,

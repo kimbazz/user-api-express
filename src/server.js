@@ -2,7 +2,7 @@ import express from "express";
 import { connectDB } from "./config/database.js";
 import userRoutes from "./interfaces/http/routes/userRoutes.js";
 import errorHandler from "./interfaces/middleware/errorHandler.js";
-import { APP_PORT } from "./config/index.js";
+import { PORT } from "./config/index.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 
@@ -15,6 +15,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/users", userRoutes);
 app.use(errorHandler);
 
-app.listen(APP_PORT || 3000, () =>
-  console.log(`API up on port ${APP_PORT || 3000}`)
+app.listen(PORT || 3000, () =>
+  console.log(`API up on port ${PORT || 3000}`)
 );

@@ -3,7 +3,7 @@ import { JWT_SECRET_KEY } from "../../config/index.js";
 import { getBearerToken } from "../../utils/security.js";
 
 const jwtAuth = (req, res, next) => {
-  const token = getBearerToken(req.header.authorization);
+  const token = getBearerToken(req.headers.authorization);
 
   if (token) {
     try {
