@@ -5,7 +5,8 @@ export default class User {
     this.email = email;
     this.passwordHash = passwordHash;
     this.createdAt = createdAt;
-    if (!email.includes("@")) {
+    const emailRegex = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
       throw new Error("Invalid email address");
     }
   }
