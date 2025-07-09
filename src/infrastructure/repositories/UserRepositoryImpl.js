@@ -12,11 +12,14 @@ export default class UserRepositoryImpl extends IUserRepository {
   }
 
   async findAll() {
-    return UserModel.find().sort({ createdAt: -1 }).lean();
+    return UserModel.find({})
+      .select("name email createdAt")
+      .sort({ createdAt: -1 })
+      .lean();
   }
 
   async findById(id) {
-    return UserModel.findById(id).lean();
+    return UserModel.findById(id).select("name email createdAt").lean();
   }
 
   async findByEmail(email) {

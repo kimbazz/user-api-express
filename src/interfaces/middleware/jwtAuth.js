@@ -25,7 +25,6 @@ const jwtAuth = (req, res, next) => {
     req.authToken = null;
     return res.status(401).send({
       message: "No token found, you are not authorized to make this request!",
-      code: 401,
     });
   }
 };
