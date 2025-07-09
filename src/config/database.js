@@ -9,7 +9,7 @@ export const connectDB = async () => {
   }
 
   try {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGO_URI, { autoIndex: false });
 
     console.log("MongoDB connected");
   } catch (error) {
