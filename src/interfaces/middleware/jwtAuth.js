@@ -1,13 +1,11 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET_KEY } from "../../config/index.js";
+import { getBearerToken } from "../../utils/security.js";
 
 const jwtAuth = (req, res, next) => {
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.split(" ")[0] === "Bearer"
-  ) {
-    const token = req.headers.authorization.split(" ")[1];
+  const token = getBearerToken(req.header.authorization);
 
+  if (token) {
     try {
       const secret = JWT_SECRET_KEY;
 
@@ -17,15 +15,18 @@ const jwtAuth = (req, res, next) => {
 
       req.user = decoded;
 
-      next();
+      return next();
     } catch (err) {
-      return res.status(401).json({ message: "Invalid or expired token" });
+      err.status = 401;
+      return next(err);
     }
   } else {
     req.authToken = null;
-    return res.status(401).send({
-      message: "No token found, you are not authorized to make this request!",
-    });
+    const err = new Error(
+      "No token found, you are not authorized to make this request!"
+    );
+    err.status = 401;
+    return next(err);
   }
 };
 
