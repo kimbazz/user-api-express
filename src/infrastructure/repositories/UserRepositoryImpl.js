@@ -7,6 +7,10 @@ export default class UserRepositoryImpl extends IUserRepository {
     return created.toObject();
   }
 
+  async delete(id) {
+    await UserModel.findByIdAndDelete(id);
+  }
+
   async findAll() {
     return UserModel.find().sort({ createdAt: -1 }).lean();
   }
@@ -22,9 +26,5 @@ export default class UserRepositoryImpl extends IUserRepository {
   async update(userEntity) {
     const { id, ...rest } = userEntity;
     return UserModel.findByIdAndUpdate(id, rest, { new: true }).lean();
-  }
-
-  async delete(id) {
-    await UserModel.findByIdAndDelete(id);
   }
 }
