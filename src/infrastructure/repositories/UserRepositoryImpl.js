@@ -8,7 +8,7 @@ export default class UserRepositoryImpl extends IUserRepository {
   }
 
   async delete(id) {
-    await UserModel.findByIdAndDelete(id);
+    return UserModel.findByIdAndDelete(id);
   }
 
   async findAll() {
