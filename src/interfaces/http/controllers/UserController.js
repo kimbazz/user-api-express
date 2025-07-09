@@ -1,9 +1,8 @@
 import UserRepoImpl from "../../../infrastructure/repositories/UserRepositoryImpl.js";
-import { hashPassword } from "../../../utils/security.js";
 import UserCase from "../../../usecases/User.js";
 
 const userRepo = new UserRepoImpl();
-const userUC = new UserCase({ userRepo, passwordHasher: hashPassword });
+const userUC = new UserCase({ userRepo });
 
 export default {
   async create(req, res, next) {
@@ -58,6 +57,21 @@ export default {
       const deleted = await userUC.delete(id);
 
       res.status(204).send(deleted);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
+
+      const { token, isError, message } = await userUC.login(email, password);
+      if (isError) {
+        return res.status(401).json({ message });
+      }
+
+      res.status(200).json({ token, isError, message });
     } catch (err) {
       next(err);
     }

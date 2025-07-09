@@ -1,10 +1,12 @@
+import jwt from "jsonwebtoken";
 import User from "../domain/entities/User.js";
+import { hashPassword, comparePassword } from "../utils/security.js";
+import { JWT_SECRET_KEY } from "../config/index.js";
 
 export default class UserCase {
-  /** @param {{ userRepo: IUserRepository, passwordHasher: func   }} dependencies */
-  constructor({ userRepo, passwordHasher }) {
+  /** @param {{ userRepo: IUserRepository }} dependencies */
+  constructor({ userRepo }) {
     this.userRepo = userRepo;
-    this.passwordHasher = passwordHasher;
   }
 
   /**
@@ -20,11 +22,39 @@ export default class UserCase {
     const user = new User({
       name: dto.name,
       email: dto.email,
-      passwordHash: await this.passwordHasher(dto.password),
+      passwordHash: await hashPassword(dto.password),
       createdAt: new Date(),
     });
 
     return this.userRepo.create(user);
+  }
+
+  /**
+   * @param {{ email:string, password:string }}
+   * @returns {{token: string, isError: boolean, message: string}}
+   */
+  async login(email, password) {
+    const user = await this.userRepo.findByEmail(email);
+    if (!user) {
+      return { token: "", isError: true, message: "Invalid email or password" };
+    }
+
+    const isMatch = await comparePassword(password, user.passwordHash);
+    if (!isMatch) {
+      return { token: "", isError: true, message: "Invalid email or password" };
+    }
+
+    // Generate JWT
+    const secretKey = JWT_SECRET_KEY;
+    if (!secretKey) throw new Error("JWT secret not set");
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, name: user.name },
+      secretKey,
+      { expiresIn: "1h" }
+    );
+
+    return { token, isError: false, message: "OK" };
   }
 
   /** @returns {Promise<User[]>} */
