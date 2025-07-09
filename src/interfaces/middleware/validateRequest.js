@@ -1,5 +1,18 @@
+import { validationResult } from "express-validator";
+
 const validateRequest = (req, res, next) => {
-  // Placeholder for request validation logic
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      message: "Something went wrong during validation",
+      errors: errors.array().map((err) => ({
+        field: err.param,
+        message: err.msg,
+      })),
+    });
+  }
+
   next();
 };
 
