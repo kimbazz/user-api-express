@@ -6,13 +6,18 @@ const userUC = new UserCase({ userRepo });
 
 export default {
   async create(req, res, next) {
-    try {
-      const resp = await userUC.create(req.body);
+    const { body } = req;
+    const { name, email, password } = body;
 
-      const { isError } = resp;
+    try {
+      const resp = await userUC.create({ name, email, password });
+
+      const { isError, message } = resp;
 
       if (isError) {
-        return res.status(400).json(resp);
+        const err = new Error(message || "Failed to create user");
+        err.status = 400;
+        throw err;
       }
 
       res.status(201).json(resp);
@@ -25,10 +30,12 @@ export default {
     try {
       const resp = await userUC.findAll();
 
-      const { isError } = resp;
+      const { isError, message } = resp;
 
       if (isError) {
-        return res.status(404).json(resp);
+        const err = new Error(message || "Failed to fetch users");
+        err.status = 404;
+        throw err;
       }
 
       res.status(200).json(resp);
@@ -39,13 +46,16 @@ export default {
 
   async getById(req, res, next) {
     const { id } = req.params;
+
     try {
       const resp = await userUC.findByID(id);
 
-      const { isError } = resp;
+      const { isError, message } = resp;
 
       if (isError) {
-        return res.status(404).json(resp);
+        const err = new Error(message || `User with id: ${id} not found`);
+        err.status = 404;
+        throw err;
       }
 
       res.status(200).json(resp);
@@ -57,16 +67,21 @@ export default {
   async update(req, res, next) {
     const { body, params } = req;
     const { id } = params;
+
     try {
       const resp = await userUC.update({
         id,
         ...body,
       });
 
-      const { isError } = resp;
+      const { isError, message } = resp;
 
       if (isError) {
-        return res.status(404).json(resp);
+        const err = new Error(
+          message || `Failed to update user with id: ${id}`
+        );
+        err.status = 404;
+        throw err;
       }
 
       res.status(200).json(resp);
@@ -77,13 +92,18 @@ export default {
 
   async delete(req, res, next) {
     const { id } = req.params;
+
     try {
       const resp = await userUC.delete(id);
 
-      const { isError } = resp;
+      const { isError, message } = resp;
 
       if (isError) {
-        return res.status(404).send(resp);
+        const err = new Error(
+          message || `Failed to delete user with id: ${id}`
+        );
+        err.status = 404;
+        throw err;
       }
 
       res.status(204).send(resp);
@@ -97,8 +117,11 @@ export default {
       const { email, password } = req.body;
 
       const { token, isError, message } = await userUC.login(email, password);
+
       if (isError) {
-        return res.status(401).json({ message });
+        const err = new Error(message || "Invalid email or password");
+        err.status = 401;
+        throw err;
       }
 
       res.status(200).json({ token, isError, message });

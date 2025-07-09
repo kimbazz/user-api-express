@@ -28,7 +28,7 @@ export default class UserCase {
       });
 
       const user = await this.userRepo.create(userToInsert);
-      if (userToInsert !== user) {
+      if (!user) {
         return {
           user: null,
           isError: true,
@@ -71,11 +71,7 @@ export default class UserCase {
       const secretKey = JWT_SECRET_KEY;
       if (!secretKey) throw new Error("JWT secret not set");
 
-      const token = jwt.sign(
-        { id: user._id, email: user.email, name: user.name },
-        secretKey,
-        { expiresIn: "1h" }
-      );
+      const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
 
       return { token, isError: false, message: "OK" };
     } catch (err) {
@@ -142,8 +138,9 @@ export default class UserCase {
   async delete(id) {
     try {
       const user = await this.userRepo.delete(id);
+      console.log(user);
       if (!user) {
-        return {
+      return {
           user: null,
           isError: true,
           message: `User with id: ${id} not found, failed to delete data`,
