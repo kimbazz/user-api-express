@@ -39,25 +39,25 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rezxplorer:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rezxplore:latest
 
-  deploy:
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "1.26.0"
-      - name: Configure kubeconfig
-        run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-      - name: Deploy to Kubernetes
-        run: |
-          # point Deployment at the new image:
-          kubectl set image deployment/the-deployment-name \
-            the-container-name=${{ needs.build-and-publish.tags }} \
-            --namespace=default
-          # wait for rollout to finish
-          kubectl rollout status deployment/the-deployment-name --namespace=default
+  # deploy:
+  #   needs: build-and-publish
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Set up kubectl
+  #       uses: azure/setup-kubectl@v3
+  #       with:
+  #         version: "1.26.0"
+  #     - name: Configure kubeconfig
+  #       run: |
+  #         echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+  #         chmod 600 $HOME/.kube/config
+  #     - name: Deploy to Kubernetes
+  #       run: |
+  #         # point Deployment at the new image:
+  #         kubectl set image deployment/the-deployment-name \
+  #           the-container-name=${{ needs.build-and-publish.tags }} \
+  #           --namespace=default
+  #         # wait for rollout to finish
+  #         kubectl rollout status deployment/the-deployment-name --namespace=default
