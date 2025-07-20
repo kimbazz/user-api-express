@@ -4,44 +4,51 @@ import UserValidator from "../validators/UserValidator.js";
 import validateRequest from "../../middleware/validateRequest.js";
 import jwtAuth from "../../middleware/jwtAuth.js";
 
-const router = Router();
+/**
+ * Factory that creates the user routes with injected dependencies.
+ * @param {{ userUC }} deps
+ */
+export default function userRoutes({ userUC }) {
+  const router = Router();
+  // instantiate controller with injected use-case
+  const userController = new UserController({ userUC });
 
-router.post(
-  "/",
-  UserValidator.create(),
-  validateRequest,
-  UserController.create
-);
+  router.post("/", UserValidator.create(), validateRequest, (req, res, next) =>
+    userController.create(req, res, next)
+  );
 
-router.post(
-  "/login",
-  UserValidator.login(),
-  validateRequest,
-  UserController.login
-);
+  router.post(
+    "/login",
+    UserValidator.login(),
+    validateRequest,
+    (req, res, next) => userController.login(req, res, next)
+  );
 
-router.get("/", jwtAuth, UserController.getAll);
+  router.get("/", jwtAuth, (req, res, next) =>
+    userController.getAll(req, res, next)
+  );
 
-router.get(
-  "/:id",
-  jwtAuth,
-  UserValidator.idParam(),
-  validateRequest,
-  UserController.getById
-);
+  router.get(
+    "/:id",
+    jwtAuth,
+    UserValidator.idParam(),
+    validateRequest,
+    (req, res, next) => userController.getById(req, res, next)
+  );
 
-router.put(
-  "/:id",
-  UserValidator.update(),
-  validateRequest,
-  UserController.update
-);
+  router.put(
+    "/:id",
+    UserValidator.update(),
+    validateRequest,
+    (req, res, next) => userController.update(req, res, next)
+  );
 
-router.delete(
-  "/:id",
-  UserValidator.idParam(),
-  validateRequest,
-  UserController.delete
-);
+  router.delete(
+    "/:id",
+    UserValidator.idParam(),
+    validateRequest,
+    (req, res, next) => userController.delete(req, res, next)
+  );
 
-export default router;
+  return router;
+}

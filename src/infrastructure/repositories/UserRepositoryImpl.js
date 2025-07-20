@@ -2,6 +2,16 @@ import IUserRepository from "../../domain/repositories/IUserRepository.js";
 import UserModel from "../models/user.model.js";
 
 export default class UserRepositoryImpl extends IUserRepository {
+  /**
+   *
+   * @param {import("mongoose").Model} userModel
+   *
+   */
+  constructor(userModel) {
+    super();
+    this.userModel = userModel;
+  }
+
   async create(userEntity) {
     const created = await UserModel.create(userEntity);
     return created.toObject();
